@@ -1,26 +1,25 @@
 #include <Arduino.h>
-// #include <myArduino.hpp>
 
-const int digitalPin[5] = {32, 34, 36, 38, 40}; // sensor
+const int digitalPin[5] = {32, 34, 36, 38, 40};                       // sensor
 int instruction[] = {3, 2, 1, 2, 4, 2, 1, 2, 3, 2, 1, 2, 4, 2, 1, 2}; // 1 = straight, 2 = reverse, 3 = turn right, 4 = turn left
-// can be enum
+
 int ite = 0;
 int white[5] = {};
 int sum_white = 0;
 int weight[5] = {5, 2, 0, -2, -5};
 
 const int Kp = 25;
-const int Tp = 50;
+const int Tp = 50; // speed
 double error;
 
 enum PIN
 {
-    //right motor
+    // right motor
     PWMA = 12,
     AIN1 = 2,
     AIN2 = 3,
 
-    //left motor
+    // left motor
     PWMB = 13,
     BIN1 = 5,
     BIN2 = 6,
@@ -34,13 +33,32 @@ enum DIRECTION
     LEFT = 4,
 };
 
-enum COLOR{
+enum COLOR
+{
     BLACK = 0,
     WHITE = 1,
 };
 
-void Tracking();
+void motorSetup()
+{
+    pinMode(PWMA, OUTPUT);
+    pinMode(PWMB, OUTPUT);
+    pinMode(AIN1, OUTPUT);
+    pinMode(AIN2, OUTPUT);
+    pinMode(BIN1, OUTPUT);
+    pinMode(BIN2, OUTPUT);
+}
+
+void tcrtSetup(){
+    for (int i = 0; i < 5; i++)
+    {
+        pinMode(digitalPin[i], INPUT);
+    }
+    Serial.begin(9600);
+}
+
 void MotorWriting(double, double);
+void Tracking();
 void Takeinstruct();
 void countwhite();
 
@@ -92,7 +110,7 @@ void Tracking()
     int vL = Tp + powerCorrection;
 
     MotorWriting(vL, vR); // Feedback to motors
-    
+
     // Serial.println(vL);
     // Serial.println(vR);
 }
@@ -146,17 +164,8 @@ void countwhite()
 
 void setup()
 {
-    pinMode(PWMA, OUTPUT);
-    pinMode(PWMB, OUTPUT);
-    pinMode(AIN1, OUTPUT);
-    pinMode(AIN2, OUTPUT);
-    pinMode(BIN1, OUTPUT);
-    pinMode(BIN2, OUTPUT);
-    for (int i = 0; i < 5; i++)
-    {
-        pinMode(digitalPin[i], INPUT);
-    }
-    Serial.begin(9600);
+    motorSetup();
+    tcrtSetup();
 }
 
 void loop()
